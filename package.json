@@ -2,7 +2,7 @@
   "name": "tetris",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ankushmalik.github.io/Tetris/",
+  "homepage": ".",
   "dependencies": {
     "gh-pages": "^2.1.1",
     "node-sass": "npm:sass@^1.77.0",
