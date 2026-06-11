@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetris-app
+  namespace: development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tetris-app
+  template:
+    metadata:
+      labels:
+        app: tetris-app
+    spec:
+      containers:
+      - name: tetris-app
+        image: TETRIS_IMAGE_PLACEHOLDER
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

@@ -1,0 +1,55 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: tetris-repo
+  EKS_CLUSTER_NAME: abhimanyu-test-sandbox
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, eks-runner]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Ensure ECR Repository Exists
+      run: |
+        aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} || aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} --image-tag-mutability IMMUTABLE --encryption-configuration encryptionType=KMS
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push Docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        sed -i "s|TETRIS_IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml
+        kubectl apply -f k8s/
