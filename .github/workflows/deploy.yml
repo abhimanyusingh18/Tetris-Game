@@ -33,6 +33,9 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
+    - name: Clean macOS metadata files
+      run: find . -name "._*" -delete || true
+
     - name: Build, tag, and push Docker image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
