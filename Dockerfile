@@ -1,12 +1,12 @@
 # Stage 1: Build the React application
-FROM node:14-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy package.json and yarn.lock
 COPY package.json yarn.lock ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 # Copy the rest of the application code
 COPY . .
@@ -15,7 +15,7 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Serve the application with Node.js
-FROM node:14-alpine
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
