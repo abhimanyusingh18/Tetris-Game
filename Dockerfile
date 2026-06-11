@@ -11,6 +11,9 @@ RUN yarn install
 # Copy the rest of the application code
 COPY . .
 
+# Fix OpenSSL error for older react-scripts (Webpack 4) on Node 17+
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Build the application
 RUN yarn build
 
