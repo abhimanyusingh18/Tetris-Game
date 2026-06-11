@@ -56,4 +56,5 @@ jobs:
         IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         sed "s|TETRIS_IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml > k8s/deployment.tmp
         mv k8s/deployment.tmp k8s/deployment.yaml
+        find k8s/ -name "._*" -delete || true
         kubectl apply -f k8s/
