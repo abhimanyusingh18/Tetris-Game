@@ -54,5 +54,6 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        sed -i "s|TETRIS_IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml
+        sed "s|TETRIS_IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml > k8s/deployment.tmp
+        mv k8s/deployment.tmp k8s/deployment.yaml
         kubectl apply -f k8s/
