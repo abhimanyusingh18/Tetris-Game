@@ -44,17 +44,18 @@ jobs:
         docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    - name: Update kubeconfig
-      run: |
-        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
-
-    - name: Deploy to EKS
+    - name: Update GitOps Manifests
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        sed "s|TETRIS_IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml > k8s/deployment.tmp
+        sed "s|image: .*|image: $IMAGE_URI|g" k8s/deployment.yaml > k8s/deployment.tmp
         mv k8s/deployment.tmp k8s/deployment.yaml
-        find k8s/ -name "._*" -delete || true
-        kubectl apply -f k8s/
+        
+        # Commit the new image tag back to the repository
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+        git add k8s/deployment.yaml
+        git commit -m "GitOps: Update image tag to $IMAGE_TAG"
+        git push

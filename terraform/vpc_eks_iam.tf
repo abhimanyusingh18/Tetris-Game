@@ -100,10 +100,10 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    sandbox_nodes = {
-      min_size       = 1
+    sandbox_workers_v4 = {
+      min_size       = 2
       max_size       = 5
-      desired_size   = 1
+      desired_size   = 2
       instance_types = ["t3.medium"]
       subnet_ids     = module.vpc.private_subnets
     }
