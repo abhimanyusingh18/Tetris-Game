@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: tetris-app
-        image: 656751414067.dkr.ecr.ap-south-1.amazonaws.com/tetris-repo:98db36b44f4d5a37f398d7f9fadb34952ed93273
+        image: 656751414067.dkr.ecr.ap-south-1.amazonaws.com/tetris-repo:725df1e720bf8f701d046c33a0ccabad00f16c64
         ports:
         - containerPort: 80
         resources:
