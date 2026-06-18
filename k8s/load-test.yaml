@@ -9,7 +9,6 @@ spec:
       containers:
       - name: hey
         image: williamyeh/hey
-        command: ["hey"]
         args: ["-z", "15m", "-c", "50", "http://tetris-service"]
       restartPolicy: Never
   backoffLimit: 0
